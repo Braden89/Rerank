@@ -1,0 +1,108 @@
+query_id,query_text,candidate_id,candidate_text,baseline_rank,baseline_score,gold_label
+1,What is reinforcement learning?,a,"Reinforcement learning trains an agent to act by maximizing cumulative reward through trial and
+error.",1,0.863,1
+1,What is reinforcement learning?,b,"In supervised learning, labels guide the model during training on input–output pairs.",2,0.7914,1
+1,What is reinforcement learning?,c,"Policies map states to actions; value functions estimate expected return from a state or
+state–action pair.",3,0.7407,0
+1,What is reinforcement learning?,d,Reward-based feedback drives learning; no labeled target is provided for each action.,4,0.6773,0
+1,What is reinforcement learning?,e,Convolutional layers capture local patterns in images using parameter sharing.,5,0.6112,0
+1,What is reinforcement learning?,f,Exploration–exploitation trade-offs balance trying new actions with using known good actions.,6,0.5601,0
+1,What is reinforcement learning?,g,A dataset of cat images is usually not used for control tasks without additional design.,7,0.4907,0
+2,Explain the difference between BFS and DFS.,a,"Breadth-first search explores nodes level by level and finds the shallowest solution in an
+unweighted graph.",1,0.8518,1
+2,Explain the difference between BFS and DFS.,b,Depth-first search follows one branch down as far as possible before backtracking.,2,0.7985,1
+2,Explain the difference between BFS and DFS.,c,DFS can use less memory than BFS but may get stuck in deep or infinite paths without checks.,3,0.7465,0
+2,Explain the difference between BFS and DFS.,d,Uniform-Cost Search expands by lowest path cost g(n) and is optimal for nonnegative costs.,4,0.6725,1
+2,Explain the difference between BFS and DFS.,e,Convolution reuses kernels across the spatial dimension to detect features.,5,0.6145,0
+2,Explain the difference between BFS and DFS.,f,BFS uses a FIFO queue; DFS uses a stack or recursion.,6,0.5625,0
+3,When should I use Uniform-Cost Search?,a,"Use Uniform-Cost Search when step costs vary and you need the lowest-cost path with nonnegative
+costs.",1,0.8695,1
+3,When should I use Uniform-Cost Search?,b,A* augments g(n) with a heuristic h(n) to guide search more directly to the goal.,2,0.7909,1
+3,When should I use Uniform-Cost Search?,c,Topological sort is for DAGs and not a path-finding algorithm.,3,0.7472,0
+3,When should I use Uniform-Cost Search?,d,UCS is Dijkstra's algorithm framed as a tree/graph search procedure.,4,0.6758,1
+3,When should I use Uniform-Cost Search?,e,"If all step costs are equal, BFS and UCS expand nodes in the same order.",5,0.6129,0
+4,Define a heuristic and give an A* example.,a,"A heuristic estimates the cost to reach a goal; in A*, f(n)=g(n)+h(n).",1,0.8521,1
+4,Define a heuristic and give an A* example.,b,Admissible heuristics never overestimate; consistent heuristics satisfy triangle inequality.,2,0.8014,0
+4,Define a heuristic and give an A* example.,c,Manhattan distance is a common heuristic on 4-connected grids.,3,0.7338,0
+4,Define a heuristic and give an A* example.,d,Backpropagation computes gradients layer by layer using the chain rule.,4,0.6719,0
+4,Define a heuristic and give an A* example.,e,"A* is optimal when h is admissible (and with graph search, consistent).",5,0.6242,1
+5,What is the PEAS framework in agents?,a,"PEAS stands for Performance measure, Environment, Actuators, Sensors.",1,0.8599,1
+5,What is the PEAS framework in agents?,b,It specifies what success looks like and how the agent perceives and acts.,2,0.8006,0
+5,What is the PEAS framework in agents?,c,"In a vacuum world, sensors detect dirt; actuators move and suck.",3,0.7455,0
+5,What is the PEAS framework in agents?,d,Batch normalization stabilizes neural network training by normalizing activations.,4,0.6793,0
+5,What is the PEAS framework in agents?,e,PEAS helps scope requirements before choosing algorithms.,5,0.6285,1
+6,How does minimax work in adversarial search?,a,Minimax assumes optimal play; MAX chooses moves maximizing the minimum utility achievable.,1,0.8659,1
+6,How does minimax work in adversarial search?,b,Alpha–beta pruning prunes branches that cannot affect the final decision.,2,0.804,1
+6,How does minimax work in adversarial search?,c,Utilities at terminal states back up to the root via min/max levels.,3,0.7349,0
+6,How does minimax work in adversarial search?,d,Dropout randomly zeros activations during training to reduce overfitting.,4,0.6815,0
+6,How does minimax work in adversarial search?,e,Evaluation functions approximate utilities when the game tree is cut off.,5,0.6205,0
+7,State Bayes' rule in words.,a,Bayes' rule updates the probability of a hypothesis after observing evidence.,1,0.8622,1
+7,State Bayes' rule in words.,b,"It relates prior, likelihood, and evidence to produce a posterior belief.",2,0.7915,1
+7,State Bayes' rule in words.,c,P(H|E) is proportional to P(E|H)P(H).,3,0.7402,0
+7,State Bayes' rule in words.,d,Learning rate schedules adjust the step size during gradient descent.,4,0.6733,0
+7,State Bayes' rule in words.,e,The normalizing constant divides by P(E).,5,0.6168,0
+8,What is the purpose of tokenization for LLMs?,a,Tokenization splits text into tokens like words or subwords before modeling.,1,0.8653,1
+8,What is the purpose of tokenization for LLMs?,b,BPE and SentencePiece create subword vocabularies to handle rare words.,2,0.8015,0
+8,What is the purpose of tokenization for LLMs?,c,Token IDs are integer indices into an embedding matrix.,3,0.7475,1
+8,What is the purpose of tokenization for LLMs?,d,Spectrograms convert audio signals for CNN-based ASR systems.,4,0.6763,0
+8,What is the purpose of tokenization for LLMs?,e,Whitespace and punctuation may be preserved depending on the tokenizer.,5,0.6239,1
+9,Describe embeddings and cosine similarity.,a,Embeddings map tokens or texts to vectors in a continuous space.,1,0.8668,1
+9,Describe embeddings and cosine similarity.,b,Cosine similarity measures the angle between vectors and ignores magnitude.,2,0.8089,1
+9,Describe embeddings and cosine similarity.,c,Dot-product similarity grows with both alignment and magnitude.,3,0.7395,1
+9,Describe embeddings and cosine similarity.,d,Principal Component Analysis reduces dimensionality by projecting onto top variance directions.,4,0.6833,0
+9,Describe embeddings and cosine similarity.,e,Normalization can improve cosine-based comparisons.,5,0.6112,0
+10,What is Retrieval-Augmented Generation (RAG)?,a,RAG retrieves relevant documents and feeds them into the prompt to ground generation in facts.,1,0.8643,1
+10,What is Retrieval-Augmented Generation (RAG)?,b,An index of chunked texts supports fast similarity search over embeddings.,2,0.8077,1
+10,What is Retrieval-Augmented Generation (RAG)?,c,Fine-tuning changes weights; RAG updates knowledge via the corpus.,3,0.7369,1
+10,What is Retrieval-Augmented Generation (RAG)?,d,Batch normalization standardizes layer inputs to stabilize training.,4,0.6888,0
+10,What is Retrieval-Augmented Generation (RAG)?,e,Reranking can improve the quality of retrieved contexts before generation.,5,0.6171,0
+11,Give an example of a prompt injection.,a,Prompt injection tries to override system instructions with adversarial text in retrieved content.,1,0.8512,1
+11,Give an example of a prompt injection.,b,Examples include 'ignore previous instructions' or data-exfiltrating patterns.,2,0.8054,1
+11,Give an example of a prompt injection.,c,"Mitigations include content filtering, instruction isolation, and output checks.",3,0.7326,0
+11,Give an example of a prompt injection.,d,Residual connections help gradient flow in deep networks.,4,0.675,0
+11,Give an example of a prompt injection.,e,User confirmation steps can reduce the impact of high-risk actions.,5,0.6178,0
+12,What causes search to be complete but not optimal?,a,A search is complete if it finds a solution when one exists.,1,0.859,1
+12,What causes search to be complete but not optimal?,b,It may be non-optimal if path costs vary and the algorithm does not expand by lowest cost.,2,0.801,0
+12,What causes search to be complete but not optimal?,c,DFS is complete in finite spaces with cycle detection but not optimal.,3,0.7477,1
+12,What causes search to be complete but not optimal?,d,BFS is optimal only when all step costs are equal.,4,0.6864,0
+12,What causes search to be complete but not optimal?,e,Stochastic gradient descent is an optimization method for training models.,5,0.6273,0
+13,Contrast precision@k and recall@k.,a,Precision@k is the fraction of retrieved items in the top-k that are relevant.,1,0.8637,1
+13,Contrast precision@k and recall@k.,b,Recall@k is the fraction of all relevant items that appear in the top-k.,2,0.7976,1
+13,Contrast precision@k and recall@k.,c,NDCG@k discounts lower ranks and compares to an ideal ranking.,3,0.7346,0
+13,Contrast precision@k and recall@k.,d,Hit rate indicates whether at least one relevant document appears in top-k.,4,0.6717,0
+13,Contrast precision@k and recall@k.,e,BLEU is a machine translation score unrelated to retrieval ranking.,5,0.613,0
+14,What is a confusion matrix used for?,a,"A confusion matrix tallies TP, FP, TN, and FN to evaluate classifiers.",1,0.8666,1
+14,What is a confusion matrix used for?,b,"It supports precision, recall, F1, and accuracy calculations.",2,0.7936,0
+14,What is a confusion matrix used for?,c,ROC curves plot TPR vs. FPR across thresholds.,3,0.7356,0
+14,What is a confusion matrix used for?,d,Grid search tunes hyperparameters by scanning a parameter grid.,4,0.6729,1
+14,What is a confusion matrix used for?,e,Class imbalance affects interpretation of accuracy.,5,0.6207,0
+15,Explain overfitting vs. underfitting.,a,Overfitting fits noise in the training data; underfitting fails to capture patterns.,1,0.8638,1
+15,Explain overfitting vs. underfitting.,b,Regularization and more data help reduce overfitting.,2,0.8003,1
+15,Explain overfitting vs. underfitting.,c,Model capacity and training time influence both phenomena.,3,0.7424,0
+15,Explain overfitting vs. underfitting.,d,K-means is an unsupervised algorithm for clustering.,4,0.6835,0
+15,Explain overfitting vs. underfitting.,e,Validation curves show performance vs. model complexity.,5,0.6111,0
+16,What is a language model's next-token probability?,a,A language model assigns probabilities to the next token given a context.,1,0.858,1
+16,What is a language model's next-token probability?,b,Softmax converts logits into a probability distribution over the vocabulary.,2,0.7921,1
+16,What is a language model's next-token probability?,c,Temperature scales the distribution to be sharper or flatter.,3,0.7427,0
+16,What is a language model's next-token probability?,d,Spectral clustering groups nodes based on graph Laplacians.,4,0.6712,0
+16,What is a language model's next-token probability?,e,Top-k and nucleus sampling truncate the candidate space during decoding.,5,0.6113,0
+17,How does beam search differ from greedy decoding?,a,Greedy decoding selects the highest-probability token at each step.,1,0.8568,1
+17,How does beam search differ from greedy decoding?,b,Beam search keeps multiple partial hypotheses and expands them in parallel.,2,0.7911,0
+17,How does beam search differ from greedy decoding?,c,Beam width controls the exploration of alternative continuations.,3,0.73,0
+17,How does beam search differ from greedy decoding?,d,Causal self-attention allows each token to see only previous tokens.,4,0.673,1
+17,How does beam search differ from greedy decoding?,e,Length penalties help avoid overly short outputs in beam search.,5,0.612,1
+18,Define Markov property in MDPs.,a,"The Markov property means the future depends only on the present state, not the full history.",1,0.8675,1
+18,Define Markov property in MDPs.,b,"MDPs define states, actions, transition dynamics, and rewards.",2,0.8023,1
+18,Define Markov property in MDPs.,c,Value iteration repeatedly applies the Bellman optimality operator.,3,0.733,0
+18,Define Markov property in MDPs.,d,Batch norm is not part of MDP definitions.,4,0.675,0
+18,Define Markov property in MDPs.,e,Policy evaluation computes values under a fixed policy.,5,0.6169,0
+19,What is a vector store index used for?,a,A vector store index enables fast nearest-neighbor lookups over embeddings.,1,0.8523,1
+19,What is a vector store index used for?,b,It stores chunk metadata and supports ANN search like HNSW or IVF.,2,0.7998,1
+19,What is a vector store index used for?,c,Chunking source documents impacts retrieval quality and speed.,3,0.7496,0
+19,What is a vector store index used for?,d,k-means clustering is used for partitioning data into k groups.,4,0.6796,0
+19,What is a vector store index used for?,e,Rerankers can reorder retrieved results based on cross-encoders.,5,0.6162,0
+20,Explain cosine vs. dot-product similarity.,a,Cosine similarity normalizes vectors; it measures angular closeness between directions.,1,0.8648,1
+20,Explain cosine vs. dot-product similarity.,b,Dot product increases with both alignment and magnitude of vectors.,2,0.7996,1
+20,Explain cosine vs. dot-product similarity.,c,Unit-normalizing embeddings makes cosine and dot product equivalent up to scaling.,3,0.7438,0
+20,Explain cosine vs. dot-product similarity.,d,BLEU scores evaluate n-gram overlap for translation.,4,0.6803,0
+20,Explain cosine vs. dot-product similarity.,e,Centering vectors can affect cosine values depending on preprocessing.,5,0.6141,0
