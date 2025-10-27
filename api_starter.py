@@ -83,7 +83,7 @@ if __name__ == "__main__":
     if os.getenv("RERANK_COMPUTE_SCORES") == "1":
         import pandas as pd
         from api_starter import score_pair
-        df = pd.read_csv("/mnt/data/rag_sample_queries_candidates.csv")
+        df = pd.read_csv("rag_sample_queries_candidates.csv")
         seen = {}
         scores = []
         for row in df.itertuples(index=False):
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                 seen[key] = score_pair(row.query_text, row.candidate_text)
             scores.append(seen[key])
         df["llm_score"] = scores
-        out_path = "/mnt/data/rag_with_llm_scores.csv"
+        out_path = "rag_with_llm_scores.csv"
         df.to_csv(out_path, index=False)
         print(f"Wrote LLM scores to {out_path}")
 

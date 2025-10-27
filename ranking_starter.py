@@ -16,12 +16,6 @@ import numpy as np
 # ---------------------------------------------------------------------
 # 1. Load data
 # ---------------------------------------------------------------------
-import pandas as pd
-import numpy as np
-
-# ---------------------------------------------------------------------
-# 1. Load data
-# ---------------------------------------------------------------------
 df = pd.read_csv("rag_sample_queries_candidates.csv")
 
 # Ensure results are ordered by the baseline rank
@@ -88,7 +82,7 @@ if __name__ == "__main__":
     if os.getenv("RERANK_COMPUTE_SCORES") == "1":
         import pandas as pd
         from api_starter import score_pair
-        df = pd.read_csv("/mnt/data/rag_sample_queries_candidates.csv")
+        df = pd.read_csv("rag_sample_queries_candidates.csv")
         # Minimal, no duplicate work beyond exact (query_id, candidate_id) pairs
         seen = {}
         scores = []
@@ -98,7 +92,7 @@ if __name__ == "__main__":
                 seen[key] = score_pair(row.query_text, row.candidate_text)
             scores.append(seen[key])
         df["llm_score"] = scores
-        out_path = "/mnt/data/rag_with_llm_scores.csv"
+        out_path = "rag_with_llm_scores.csv"
         df.to_csv(out_path, index=False)
         print(f"Wrote LLM scores to {out_path}")
 
@@ -107,3 +101,58 @@ if __name__ == "__main__":
 # Trigger with: RERANK_EVAL=1
 # Optional: RERANK_FALLBACK_BASELINE=1 (if llm_score missing, derive from baseline_score)
 # ----------------------------
+if __name__ == "__main__":
+    import os
+    from pathlib import Path
+    if os.getenv("RERANK_EVAL") == "1":
+        import math
+        import pandas as pd
+
+        # Load LLM-scored pairs
+        in_path = "rag_with_llm_scores.csv"
+        if not Path(in_path).exists():
+            raise SystemExit(f"Missing {in_path}. Run with RERANK_COMPUTE_SCORES=1 first.")
+
+        df = pd.read_csv(in_path)
+
+        # (Very small) Optional fallback if llm_score is missing or NaN
+        if os.getenv("RERANK_FALLBACK_BASELINE") == "1":
+            if "llm_score" not in df.columns or df["llm_score"].isna().any():
+                b = df["baseline_score"]
+                bn = (b - b.min()) / (b.max() - b.min() + 1e-9)
+                df["llm_score"] = (bn * 5).round().astype(int).clip(0, 5)
+
+        if "llm_score" not in df.columns:
+            raise SystemExit("No llm_score column found and fallback disabled.")
+
+        # Sort within each query by llm_score DESC, then baseline_rank ASC as a stable tie-breaker
+        df_sorted = df.sort_values(by=["query_id", "llm_score", "baseline_rank"],
+                                   ascending=[True, False, True]).copy()
+
+        # Assign reranked positions per query
+        df_sorted["rerank"] = df_sorted.groupby("query_id").cumcount() + 1
+
+        # Save a reranked CSV for inspection
+        out_path = "rag_reranked.csv"
+        df_sorted.to_csv(out_path, index=False)
+        print(f"Wrote reranked CSV to {out_path}")
+
+        # Evaluate using existing metrics
+        try:
+            _ = K
+        except NameError:
+            K = 3
+
+        results = []
+        for qid, group in df_sorted.groupby("query_id"):
+            labels_in_order = group["gold_label"].tolist()
+            p = precision_at_k(labels_in_order, K)
+            r = recall_at_k(labels_in_order, K)
+            n = ndcg_at_k(labels_in_order, K)
+            results.append({"query_id": qid, f"precision@{K}": p, f"recall@{K}": r, f"nDCG@{K}": n})
+
+        metrics = pd.DataFrame(results)
+        print("\nReranked metrics (per query):")
+        print(metrics.round(3))
+        print("\nReranked average metrics:")
+        print(metrics[[f"precision@{K}", f"recall@{K}", f"nDCG@{K}"]].mean().round(3))
