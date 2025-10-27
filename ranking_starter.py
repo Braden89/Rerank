@@ -16,6 +16,12 @@ import numpy as np
 # ---------------------------------------------------------------------
 # 1. Load data
 # ---------------------------------------------------------------------
+import pandas as pd
+import numpy as np
+
+# ---------------------------------------------------------------------
+# 1. Load data
+# ---------------------------------------------------------------------
 df = pd.read_csv("rag_sample_queries_candidates.csv")
 
 # Ensure results are ordered by the baseline rank
@@ -72,3 +78,32 @@ metrics = pd.DataFrame(results)
 print(metrics.round(3))
 print("\nAverage metrics:")
 print(metrics[[f"precision@{K}", f"recall@{K}", f"nDCG@{K}"]].mean().round(3))
+
+# ----------------------------
+# (Optional) Step 2: LLM scores
+# Set env RERANK_COMPUTE_SCORES=1 to compute an llm_score column and save CSV.
+# ----------------------------
+if __name__ == "__main__":
+    import os
+    if os.getenv("RERANK_COMPUTE_SCORES") == "1":
+        import pandas as pd
+        from api_starter import score_pair
+        df = pd.read_csv("/mnt/data/rag_sample_queries_candidates.csv")
+        # Minimal, no duplicate work beyond exact (query_id, candidate_id) pairs
+        seen = {}
+        scores = []
+        for row in df.itertuples(index=False):
+            key = (row.query_id, row.candidate_id)
+            if key not in seen:
+                seen[key] = score_pair(row.query_text, row.candidate_text)
+            scores.append(seen[key])
+        df["llm_score"] = scores
+        out_path = "/mnt/data/rag_with_llm_scores.csv"
+        df.to_csv(out_path, index=False)
+        print(f"Wrote LLM scores to {out_path}")
+
+# ----------------------------
+# (Optional) Step 3: Rerank by llm_score and evaluate
+# Trigger with: RERANK_EVAL=1
+# Optional: RERANK_FALLBACK_BASELINE=1 (if llm_score missing, derive from baseline_score)
+# ----------------------------
