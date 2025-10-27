@@ -82,8 +82,8 @@ if __name__ == "__main__":
     if os.getenv("RERANK_COMPUTE_SCORES") == "1":
         import pandas as pd
         from api_starter import score_pair
+        FEWSHOT = os.getenv("RERANK_FEWSHOT") == "1"
         df = pd.read_csv("rag_sample_queries_candidates.csv")
-        # Minimal, no duplicate work beyond exact (query_id, candidate_id) pairs
         seen = {}
         scores = []
         for row in df.itertuples(index=False):
@@ -107,9 +107,10 @@ if __name__ == "__main__":
     if os.getenv("RERANK_EVAL") == "1":
         import math
         import pandas as pd
+        FEWSHOT = os.getenv("RERANK_FEWSHOT") == "1"
 
         # Load LLM-scored pairs
-        in_path = "rag_with_llm_scores.csv"
+        in_path = "rag_with_llm_scores.csv" if FEWSHOT else "rag_with_llm_scores.csv"
         if not Path(in_path).exists():
             raise SystemExit(f"Missing {in_path}. Run with RERANK_COMPUTE_SCORES=1 first.")
 
@@ -133,7 +134,7 @@ if __name__ == "__main__":
         df_sorted["rerank"] = df_sorted.groupby("query_id").cumcount() + 1
 
         # Save a reranked CSV for inspection
-        out_path = "rag_reranked.csv"
+        out_path = "rag_reranked_fewshot.csv" if FEWSHOT else "rag_reranked.csv"
         df_sorted.to_csv(out_path, index=False)
         print(f"Wrote reranked CSV to {out_path}")
 
@@ -156,3 +157,57 @@ if __name__ == "__main__":
         print(metrics.round(3))
         print("\nReranked average metrics:")
         print(metrics[[f"precision@{K}", f"recall@{K}", f"nDCG@{K}"]].mean().round(3))
+
+# ----------------------------
+# (Optional) Step 4: Compare baseline vs reranked metrics
+# Trigger with: RERANK_COMPARE=1
+# ----------------------------
+if __name__ == "__main__":
+    import os
+    if os.getenv("RERANK_COMPARE") == "1":
+        import pandas as pd
+        from pathlib import Path
+        FEWSHOT = os.getenv("RERANK_FEWSHOT") == "1"
+
+        # Baseline metrics (recompute to avoid relying on prior prints)
+        base_df = pd.read_csv("rag_sample_queries_candidates.csv").sort_values(["query_id", "baseline_rank"])
+        try:
+            _ = K
+        except NameError:
+            K = 3
+
+        base_rows = []
+        for qid, group in base_df.groupby("query_id"):
+            labels = group["gold_label"].tolist()
+            p = precision_at_k(labels, K)
+            r = recall_at_k(labels, K)
+            n = ndcg_at_k(labels, K)
+            base_rows.append({"query_id": qid, f"precision@{K}": p, f"recall@{K}": r, f"nDCG@{K}": n})
+        base_metrics = pd.DataFrame(base_rows).set_index("query_id")
+
+        # Reranked metrics
+        rerank_path = Path("rag_reranked_fewshot.csv" if FEWSHOT else "rag_reranked.csv")
+        if not rerank_path.exists():
+            raise SystemExit("Missing rag_reranked.csv. Run Step 3 first (RERANK_EVAL=1).")
+        reranked = pd.read_csv(rerank_path)
+
+        rr_rows = []
+        for qid, group in reranked.groupby("query_id"):
+            labels = group["gold_label"].tolist()
+            p = precision_at_k(labels, K)
+            r = recall_at_k(labels, K)
+            n = ndcg_at_k(labels, K)
+            rr_rows.append({"query_id": qid, f"precision@{K}": p, f"recall@{K}": r, f"nDCG@{K}": n})
+        rr_metrics = pd.DataFrame(rr_rows).set_index("query_id")
+
+        # Side-by-side comparison (per query)
+        compare = base_metrics.add_prefix("baseline_").join(rr_metrics.add_prefix("reranked_"))
+        print("\nPer-query comparison:")
+        print(compare.round(3))
+
+        # Average comparison
+        avg_base = base_metrics.mean().rename(lambda s: "baseline_" + s)
+        avg_rr = rr_metrics.mean().rename(lambda s: "reranked_" + s)
+        avg = pd.concat([avg_base, avg_rr], axis=0).to_frame("mean")
+        print("\nAverage comparison:")
+        print(avg.round(3))

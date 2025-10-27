@@ -14,6 +14,7 @@ Use OpenAIServerModel due to API compatibility
 #############################################
 import os
 import re
+import time
 from typing import Optional
 try:
     import dotenv  # type: ignore
@@ -26,6 +27,7 @@ from openai import OpenAI
 _API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
 _BASE_URL = os.getenv("OPENAI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
 _MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+_FEWSHOT = os.getenv("RERANK_FEWSHOT") == "1"
 
 _client: Optional[OpenAI] = None
 
@@ -44,20 +46,31 @@ _SYSTEM = (
 )
 
 def score_pair(query: str, candidate: str, retries: int = 2) -> int:
-    """Return an integer 0..5 relevance score using the chat model.
-    We strictly parse the first digit 0-5 from the response. If parsing fails,
-    we retry up to `retries` times; on persistent failure we return 0.
-    """
     client = _get_client()
+
+    # Optional few-shot exemplars (enabled with RERANK_FEWSHOT=1)
+    examples = ""
+    if _FEWSHOT:
+        examples = (
+            "Examples (format: Query / Candidate -> Score)\n"
+            "Q: what is python typing\n"
+            "C: Python typing refers to type hints like List[int] and Optional[str]. -> 4\n"
+            "Q: who won the 2018 world cup\n"
+            "C: France won the FIFA World Cup in 2018. -> 5\n\n"
+        )
+
     prompt = (
+        examples +
         "Query:\n" + query.strip() + "\n\n"
         "Candidate:\n" + candidate.strip() + "\n\n"
         "Only output a single integer from 0 to 5, nothing else."
     )
+
     attempt = 0
     while True:
         attempt += 1
         try:
+            start = time.time()
             resp = client.chat.completions.create(
                 model=_MODEL,
                 messages=[
@@ -67,15 +80,15 @@ def score_pair(query: str, candidate: str, retries: int = 2) -> int:
                 temperature=0,
                 max_tokens=4,
             )
+            latency = time.time() - start  # optional for logging
             text = (resp.choices[0].message.content or "").strip()
             m = re.search(r"[0-5]", text)
             if m:
                 return int(m.group(0))
         except Exception:
-            # swallow and retry
             pass
         if attempt > retries:
-            return 0  # safest fallback
+            return 0   
 
 __all__ = ["score_pair"]
 if __name__ == "__main__":
